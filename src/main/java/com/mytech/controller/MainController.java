@@ -1,7 +1,9 @@
 package com.mytech.controller;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -43,11 +45,16 @@ public class MainController {
         return WRONG_INPUT_MESSAGE;
     }
 
-    public static String HELP_MESSAGE = "\nUsage: PrimeNumberGenerator STRATEGY_ID BEGIN_NUMBER END_NUMBER" + "\nFor example PrimeNumberGenerator n 0 10" + "\n\nSTRATEGY_ID value is one of the following:" + inputToStrategies
-        .entrySet().stream()
-        .map(e -> "\t" + e.getKey() + "\t//" + e.getValue())
-        .collect(Collectors.joining(
-            "\n")) + "\nBEGIN_NUMBER is from 0 to INTEGER.MAXVALUE" + "\nEND_NUMBER is from 0 to INTEGER.MAXVALUE";
+    public static String HELP_MESSAGE =
+        "\nUsage: PrimeNumberGenerator STRATEGY_ID BEGIN_NUMBER END_NUMBER" +
+            "\nFor example PrimeNumberGenerator n 0 10" +
+            "\nUse 'primeNumberGenerator test' to display speed of each generation strategy" +
+            "\n average speed would be in stored in result.csv." +
+            "\n\nSTRATEGY_ID value is one of the following:" +
+            inputToStrategies.entrySet().stream()
+                .map(e -> "\t" + e.getKey() + "\t//" + e.getValue())
+                .collect(Collectors.joining(
+                    "\n")) + "\nBEGIN_NUMBER is from 0 to INTEGER.MAXVALUE" + "\nEND_NUMBER is from 0 to INTEGER.MAXVALUE";
 
     private String printHelpMessage() {
         return HELP_MESSAGE;
@@ -73,7 +80,34 @@ public class MainController {
         );
         inputFlagToInputHandler.put(ParsedInput.Status.TEST,
             inputResults -> {
-                generator.generateTest();
+                StringBuilder text = new StringBuilder();
+                text.append("Strategy, time\n");
+                for (PrimeNumberGenerator.Strategies s : PrimeNumberGenerator.Strategies.values()) {
+                    long time = 0;
+                    for (int i = 0; i < 7; i++) {
+                        PrimeNumberGenerator.GenerationResult result = generator.generate(s, 0, 99999);
+                        time += result.getTimeToGenerate();
+                    }
+                    time = Math.round(time/7);
+                    text.append(String.format("%s, %s\n", s, time));
+                }
+                File file = new File("results.csv");
+
+                FileWriter fileWriter = null;
+                try {
+                    fileWriter = new FileWriter(file);
+                    fileWriter.write(text.toString());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    if (fileWriter != null) {
+                        try {
+                            fileWriter.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
                 return new PresentationModel(ParsedInput.Status.TEST, "");
             }
         );
@@ -84,7 +118,7 @@ public class MainController {
 
         inputFlagToInputHandler.put(ParsedInput.Status.OK,
             inputResults -> {
-                List<Integer> primes = generator
+                PrimeNumberGenerator.GenerationResult primes = generator
                     .generate(inputResults.getStrategy(),
                         inputResults.getBegin(),
                         inputResults.getEnd());
@@ -119,6 +153,7 @@ public class MainController {
      * 2) calls input parser
      * 3) invokes handler appropriate for parsed input status
      * 4) returns presentation model containing status and text to display     *
+     *
      * @param args raw input
      * @return presentation model
      */

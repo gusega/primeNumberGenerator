@@ -25,7 +25,7 @@ public class MainControllerTest {
     public void setUp() {
         Mockito.when(generator.generate(
             Mockito.any(PrimeNumberGenerator.Strategies.class),
-            Mockito.anyInt(), Mockito.anyInt())).thenReturn(Collections.emptyList());
+            Mockito.anyInt(), Mockito.anyInt())).thenReturn(PrimeNumberGenerator.GenerationResult.EMPTY);
     }
 
     @Test

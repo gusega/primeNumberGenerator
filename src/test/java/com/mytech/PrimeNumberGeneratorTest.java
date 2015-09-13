@@ -37,7 +37,7 @@ public class PrimeNumberGeneratorTest {
         List<Integer> expected =
             Arrays.asList(2, 3, 5, 7);
         assertEquals(expected,
-            generator.generate(strategy, 1, 10));
+            generator.generate(strategy, 1, 10).getPrimes());
     }
 
     @Test
@@ -45,43 +45,42 @@ public class PrimeNumberGeneratorTest {
         List<Integer> expected =
             Arrays.asList(2, 3, 5, 7, 11);
         assertEquals(expected,
-            generator.generate(strategy, 1, 12));
+            generator.generate(strategy, 1, 12).getPrimes());
     }
     @Test
     public void testGeneratePrimeNumbersInitialSmaller() throws Exception {
         List<Integer> expected =
             Arrays.asList(2, 3, 5);
         assertEquals(expected,
-            generator.generate(strategy, 1, 7));
+            generator.generate(strategy, 1, 7).getPrimes());
     }
 
     @Test
     public void testGeneratePrimeSingle() throws Exception {
-        List<Integer> expected =
-            Arrays.asList(1);
-        assertEquals(expected,
-            generator.generate(strategy, 0, 2));
+        assertEquals(
+            Collections.singletonList(1),
+            generator.generate(strategy, 0, 2).getPrimes());
     }
 
     @Test
     public void testGeneratePrimeEmptyOne() throws Exception {
         List<Integer> expected = Collections.emptyList();
         assertEquals(expected,
-            generator.generate(strategy, 1, 1));
+            generator.generate(strategy, 1, 1).getPrimes());
     }
 
     @Test
     public void testGeneratePrimeEmptyAboveOne() throws Exception {
         List<Integer> expected = Collections.emptyList();
         assertEquals(expected,
-            generator.generate(strategy, 2, 2));
+            generator.generate(strategy, 2, 2).getPrimes());
     }
 
     @Test
     public void testGeneratePrimeSomeSingleNumber() throws Exception {
         List<Integer> expected = Arrays.asList(11, 13);
         assertEquals(expected,
-            generator.generate(strategy, 9, 14));
+            generator.generate(strategy, 9, 14).getPrimes());
     }
 
     @Test
@@ -94,7 +93,7 @@ public class PrimeNumberGeneratorTest {
     public void testWrongInput() throws Exception {
         List<Integer> expected = Collections.emptyList();
         assertEquals(expected,
-            generator.generate(strategy, 4, 2));
+            generator.generate(strategy, 4, 2).getPrimes());
     }
 
 }

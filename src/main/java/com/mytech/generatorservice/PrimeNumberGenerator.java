@@ -36,29 +36,52 @@ public class PrimeNumberGenerator {
             optimizedGenerator2);
     }
 
-    public List<Integer> generate(Strategies strategy, int begin, int end) {
+    public static class GenerationResult {
+        private final List<Integer> primes;
+        private final long timeToGenerate;
+
+        public GenerationResult(List<Integer> primes, long timeToGenerate) {
+            this.primes = primes;
+            this.timeToGenerate = timeToGenerate;
+        }
+
+        public List<Integer> getPrimes() {
+            return primes;
+        }
+
+        public long getTimeToGenerate() {
+            return timeToGenerate;
+        }
+
+        @Override
+        public String toString() {
+            return "GenerationResult{" +
+                "primes=" + primes +
+                ", timeToGenerate=" + timeToGenerate +
+                '}';
+        }
+
+        public static GenerationResult EMPTY = new GenerationResult(Collections.emptyList(), 0);
+
+    }
+
+
+    public GenerationResult generate(Strategies strategy, int begin, int end) {
         long timestamp = System.nanoTime();
         if (begin >= end || begin < 0 || end < 0) {
             /**
              * if begin > end, begin < 0, end < 0
              * return empty collection
              */
-            return Collections.emptyList();
+            return GenerationResult.EMPTY;
         }
         List<Integer> primes = strategyToGenerator.get(strategy).generate(begin, end);
+        long time = Math.round((System.nanoTime() - timestamp) * Math.pow(10, -6));
         logger.info(String.format("Items generated: %s, duration: %s milliseconds. Strategy %s",
             primes.size(),
-            Math.round((System.nanoTime() - timestamp) * Math.pow(10, -6)),
+            time,
             strategy.name()));
-        return primes;
-    }
-
-    public void generateTest() {
-        for (Strategies s : Strategies.values()) {
-            for (int i = 0; i < 5; i++) {
-                this.generate(s, 0, 99999);
-            }
-        }
+        return new GenerationResult(primes, time);
     }
 
     public enum Strategies {
